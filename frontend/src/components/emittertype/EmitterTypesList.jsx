@@ -26,16 +26,16 @@ const EmitterTypesList = () => {
         EmitterTypeService
             .getEmitterTypesList(pageNumber)
             .then(response => {
-                setTotalPages(response.data.totalPages);
-                setEmitterTypesList(response.data.content);
+                setTotalPages(response.totalPages);
+                setEmitterTypesList(response.content);
             })
             .catch(error => {
                 console.log(error);
-                if (error && error.status == '400') {
+                if (error && error.status === '400') {
                     navigate("/error", {
                         state: {
-                            status: error.data.status,
-                            message: error.data.message
+                            status: error.status,
+                            message: error.message
                         }
                     })
                 }
@@ -45,7 +45,6 @@ const EmitterTypesList = () => {
     return (
         <Container maxWidth="md" sx={{ p: 3 }}>
             <Stack spacing={3}>
-
 
                 <Paper elevation={1} sx={{ pt: 3 }}>
                     <HeadingText text={'Типы излучателей'} />
@@ -67,7 +66,6 @@ const EmitterTypesList = () => {
                                         </Stack>
                                     }>
                                     <ListItemText>
-                                        {/* <Typography variant="h5" color="text.primary">{item.name}</Typography> */}
                                         <RegularText text={item.name} />
                                     </ListItemText>
                                 </ListItem>
