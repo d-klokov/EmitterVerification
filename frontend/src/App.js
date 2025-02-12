@@ -4,6 +4,9 @@ import EmitterTypesList from './components/emittertype/EmitterTypesList';
 import Navbar from './components/navbar/Navbar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import HomePage from './components/HomePage';
+import CreateEmitterType from './components/emittertype/CreateEmitterType';
+import EditEmitterType from './components/emittertype/EditEmitterType';
+import DeleteEmitterType from './components/emittertype/DeleteEmitterType';
 
 const theme = createTheme({
   palette: {
@@ -25,6 +28,9 @@ function App() {
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/types-list' element={<EmitterTypesList />} />
+          <Route path='/create-type' element={<CreateEmitterType />} />
+          <Route path='/edit-type/:id' element={<EditEmitterType />} />
+          <Route path='/delete-type/:id' element={<DeleteEmitterType />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

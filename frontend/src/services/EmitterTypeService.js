@@ -1,54 +1,81 @@
 import axios from "axios"
+import ApiRequest from "../components/ApiRequest"
 
 const PATH = 'http://localhost:8080/api/v1/types'
 
 class EmitterTypeService {
     getEmitterTypesList(pageNumber) {
-        return axios
-            .get(PATH, {
-                headers: {
-                    "Content-type": "application/json"
-                },
-                params: {
-                    page: pageNumber
-                }
-            })
+        const url = new URL(PATH);
+        url.searchParams.append('page', pageNumber);
+        
+        const getOptions = {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json'
+            }
+        }
+
+        return ApiRequest(url, getOptions);
     }
 
     getEmitterTypeById(id) {
-        return axios
-            .get(PATH + `/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
+        const url = new URL(PATH + `/${id}`);
+        
+        const getOptions = {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json'
+            }
+        }
+
+        return ApiRequest(url, getOptions);
     }
 
     createEmitterType(emitterTypeRequest) {
-        return axios
-            .post(PATH, emitterTypeRequest, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
+        const url = new URL(PATH);
+        
+        const postOptions = {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(emitterTypeRequest)
+        }
+
+        return ApiRequest(url, postOptions);
     }
 
     editEmitterType(id, emitterTypeRequest) {
-        return axios
-            .put(PATH + `/${id}`, emitterTypeRequest, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
+        const url = new URL(PATH + `/${id}`);
+        
+        const putOptions = {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(emitterTypeRequest)
+        }
+
+        return ApiRequest(url, putOptions);
     }
 
     deleteEmitterType(id) {
-        return axios
-            .delete(PATH + `/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
+        const url = new URL(PATH + `/${id}`);
+        
+        const deleteOptions = {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json'
+            }
+        }
+
+        return ApiRequest(url, deleteOptions);
+        // return axios
+        //     .delete(PATH + `/${id}`, {
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         }
+        //     })
     }
 }
 
