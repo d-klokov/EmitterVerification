@@ -52,7 +52,7 @@ class EmitterTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test get all developers functionality")
+    @DisplayName("Test get all emitter types functionality")
     void givenThreeEmitterTypes_whenGetAll_thenListOfThreeEmitterTypesReturned() {
         // given
         EmitterType secondEmitterType = EmitterType.builder().id(2L).name("Type 2").build();
@@ -165,13 +165,13 @@ class EmitterTypeServiceTest {
     void givenEmitterTypeAndId_whenUpdate_thenNotFoundExceptionIsThrown() {
         // given
         EmitterType updatedEmitterType = EmitterType.builder().id(1L).name("Updated Type 1").build();
-        Long emitterToUpdateId = emitterType.getId();
+        Long emitterTypeToUpdateId = emitterType.getId();
 
         given(emitterTypeRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
         ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.updateEmitterType(emitterToUpdateId, updatedEmitterType);
+            emitterTypeService.updateEmitterType(emitterTypeToUpdateId, updatedEmitterType);
         });
 
         // then
@@ -183,14 +183,14 @@ class EmitterTypeServiceTest {
     void givenEmitterTypeAndId_whenUpdate_thenConflictExceptionIsThrown() {
         // given
         EmitterType updatedEmitterType = EmitterType.builder().id(1L).name("Type 1").build();
-        Long emitterToUpdateId = emitterType.getId();
+        Long emitterTypeToUpdateId = emitterType.getId();
 
         given(emitterTypeRepository.findById(anyLong())).willReturn(Optional.of(emitterType));
         given(emitterTypeRepository.save(any(EmitterType.class))).willThrow(conflictException);
 
         // when
         ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.updateEmitterType(emitterToUpdateId, updatedEmitterType);
+            emitterTypeService.updateEmitterType(emitterTypeToUpdateId, updatedEmitterType);
         });
 
         // then
@@ -214,13 +214,13 @@ class EmitterTypeServiceTest {
     @DisplayName("Test delete by id functionality (not found)")
     void givenId_whenDeleteById_thenExceptionIsThrown() {
         // given
-        Long emitterToDeleteId = emitterType.getId();
+        Long emitterTypeToDeleteId = emitterType.getId();
 
         given(emitterTypeRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
         ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.deleteEmitterType(emitterToDeleteId);
+            emitterTypeService.deleteEmitterType(emitterTypeToDeleteId);
         });
 
         // then

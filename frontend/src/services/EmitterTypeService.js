@@ -70,12 +70,6 @@ class EmitterTypeService {
         }
 
         return ApiRequest(url, deleteOptions);
-        // return axios
-        //     .delete(PATH + `/${id}`, {
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         }
-        //     })
     }
 }
 
