@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Container, Paper, Stack, List, ListItem, ListItemText, IconButton, Typography, Button, Pagination, Divider } from "@mui/material";
+import { Container, Paper, Stack, List, ListItem, ListItemText, IconButton, Button, Pagination, Divider } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EmitterTypeService from "../../services/EmitterTypeService";
