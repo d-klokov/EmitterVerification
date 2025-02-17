@@ -104,7 +104,7 @@ public class EmitterOwnerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<EmitterOwnerResponse> editOwner(@PathVariable("id") Long id,
-            @RequestBody EmitterOwnerRequest ownerRequest,
+            @RequestBody @Valid EmitterOwnerRequest ownerRequest,
             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
