@@ -15,11 +15,8 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.klokov.backend.exception.ApiException;
-import ru.klokov.backend.model.EmitterType;
 import ru.klokov.backend.model.EmitterOwner;
-import ru.klokov.backend.repository.EmitterTypeRepository;
 import ru.klokov.backend.repository.EmitterOwnerRepository;
-import ru.klokov.backend.service.EmitterTypeService;
 import ru.klokov.backend.service.EmitterOwnerService;
 
 @Service
