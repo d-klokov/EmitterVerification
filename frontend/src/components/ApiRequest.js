@@ -1,15 +1,9 @@
 const ApiRequest = async (url = '', options = null) => {
-    let data = null;
-    try {
-        const response = await fetch(url, options);
+    const response = await fetch(url, options);
 
-        if (!response.ok) throw Error(response.json.message);
+    if (!response.ok) throw await response.json();
 
-        data = await response.json();
-    } catch (error) {
-        data = error.message;
-    } 
-    return data;
+    return response.json();
 }
 
 export default ApiRequest;

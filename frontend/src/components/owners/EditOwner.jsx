@@ -2,36 +2,36 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { Container, Paper, Stack, Typography } from "@mui/material";
-import EmitterTypeService from "../../services/EmitterTypeService";
+import { Container, Paper, Stack } from "@mui/material";
+import OwnerService from "../../services/OwnerService";
 import HeadingText from "../common/HeadingText";
 
-export default function EditEmitterType() {
+export default function EditOwner() {
     const initialEditRequest = {
         name: ""
     }
 
-    const initialType = {
+    const initialOwner = {
         id: "",
         name: ""
     }
 
     const [request, setRequest] = useState(initialEditRequest)
-    const [type, setType] = useState(initialType)
+    const [owner, setOwner] = useState(initialOwner)
 
     useEffect(() => {
-        getEmitterTypeById(params.id);
+        getOwnerById(params.id);
     }, []);
 
     const navigate = useNavigate();
 
     let params = useParams();
 
-    const getEmitterTypeById = (id) => {
-        EmitterTypeService
-            .getEmitterTypeById(id)
+    const getOwnerById = (id) => {
+        OwnerService
+            .getOwnerById(id)
             .then((response) => {
-                setType(response)
+                setOwner(response)
             })
             .catch(error => {
                 console.log(error);
@@ -46,11 +46,11 @@ export default function EditEmitterType() {
             })
     }
 
-    const editEmitterType = () => {
-        EmitterTypeService
-            .editEmitterType(params.id, request)
+    const editOwner = () => {
+        OwnerService
+            .editOwner(params.id, request)
             .then(() => {
-                navigate("/types-list");
+                navigate("/owners-list");
             })
             .catch(error => {
                 console.log(error);
@@ -68,13 +68,14 @@ export default function EditEmitterType() {
     return (
         <Container maxWidth="md" sx={{ p: 3 }}>
             <Stack spacing={3}>
-                <Paper elevation={1} sx={{ pt: 2 }}>
-                    <HeadingText text={'Редактировать владельца'} />
-                    <Stack spacing={3} padding={3}>
-                        <TextField id="name" label="Имя" defaultValue={type.name} variant="outlined"
+                <HeadingText text={'Редактировать владельца'} />
+
+                <Paper elevation={1} sx={{ p: 3 }}>
+                    <Stack spacing={3}>
+                        <TextField id="name" label="Имя" defaultValue={owner.name} variant="outlined"
                             onChange={(event) => setRequest({ ...request, name: event.target.value })} />
                         <Stack direction={"row"} justifyContent="end">
-                            <Button variant="contained" onClick={editEmitterType}>Готово</Button>
+                            <Button variant="contained" onClick={editOwner}>Готово</Button>
                         </Stack>
                     </Stack>
                 </Paper>
