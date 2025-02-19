@@ -1,20 +1,20 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import EmitterTypeService from "../../services/EmitterTypeService";
+import OwnerService from "../../services/OwnerService";
 
-export default function DeleteEmitterType() {
+export default function DeleteOwner() {
     const navigate = useNavigate();
 
     let params = useParams();
 
     useEffect(() => {
-        deleteEmitterTypeById(params.id);
-    }, [params.id]);
+        deleteOwnerById(params.id);
+    }, []);
 
-    const deleteEmitterTypeById = (id) => {
-        EmitterTypeService.deleteEmitterType(id)
+    const deleteOwnerById = (id) => {
+        OwnerService.deleteOwner(id)
             .then(() => {
-                navigate("/types-list");
+                navigate("/owners-list");
             })
             .catch(error => {
                 console.log(error);

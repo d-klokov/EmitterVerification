@@ -1,9 +1,9 @@
 import ApiRequest from "../components/ApiRequest"
 
-const PATH = 'http://localhost:8080/api/v1/types'
+const PATH = 'http://localhost:8080/api/v1/owners'
 
-class EmitterTypeService {
-    getEmitterTypesList(pageNumber) {
+class OwnerService {
+    getOwnersList(pageNumber) {
         const url = new URL(PATH);
         url.searchParams.append('page', pageNumber);
         
@@ -17,7 +17,7 @@ class EmitterTypeService {
         return ApiRequest(url, getOptions);
     }
 
-    getEmitterTypeById(id) {
+    getOwnerById(id) {
         const url = new URL(PATH + `/${id}`);
         
         const getOptions = {
@@ -30,7 +30,7 @@ class EmitterTypeService {
         return ApiRequest(url, getOptions);
     }
 
-    createEmitterType(emitterTypeRequest) {
+    createOwner(ownerRequest) {
         const url = new URL(PATH);
         
         const postOptions = {
@@ -38,13 +38,13 @@ class EmitterTypeService {
             headers: {
                 'Content-type': 'application/json'
             },
-            body: JSON.stringify(emitterTypeRequest)
+            body: JSON.stringify(ownerRequest)
         }
 
         return ApiRequest(url, postOptions);
     }
 
-    editEmitterType(id, emitterTypeRequest) {
+    editOwner(id, ownerRequest) {
         const url = new URL(PATH + `/${id}`);
         
         const putOptions = {
@@ -52,13 +52,13 @@ class EmitterTypeService {
             headers: {
                 'Content-type': 'application/json'
             },
-            body: JSON.stringify(emitterTypeRequest)
+            body: JSON.stringify(ownerRequest)
         }
 
         return ApiRequest(url, putOptions);
     }
 
-    deleteEmitterType(id) {
+    deleteOwner(id) {
         const url = new URL(PATH + `/${id}`);
         
         const deleteOptions = {
@@ -72,4 +72,4 @@ class EmitterTypeService {
     }
 }
 
-export default new EmitterTypeService()
+export default new OwnerService()
