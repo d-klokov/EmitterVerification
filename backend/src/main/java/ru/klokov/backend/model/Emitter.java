@@ -5,8 +5,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-import org.hibernate.annotations.ColumnDefault;
-
 @Entity
 @Table(name = "emitter")
 @Getter

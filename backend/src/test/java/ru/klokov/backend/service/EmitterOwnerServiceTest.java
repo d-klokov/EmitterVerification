@@ -43,8 +43,8 @@ class EmitterOwnerServiceTest {
 
     private EmitterOwner emitterOwner;
 
-    private ApiException notFoundException = new ApiException(HttpStatus.NOT_FOUND);
-    private ApiException conflictException = new ApiException(HttpStatus.CONFLICT);
+    private final ApiException notFoundException = new ApiException(HttpStatus.NOT_FOUND);
+    private final ApiException conflictException = new ApiException(HttpStatus.CONFLICT);
 
     @BeforeEach
     public void setUp() {
