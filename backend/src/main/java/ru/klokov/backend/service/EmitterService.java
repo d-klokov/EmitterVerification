@@ -8,7 +8,7 @@ import java.util.List;
 public interface EmitterService {
     List<Emitter> getAllEmitters();
     Emitter getEmitterById(Long id);
-    Page<Emitter> getEmittersPage(int pageNumber);
+    Page<Emitter> getEmittersPage(int pageNumber, int pageSize, String sortField, boolean sortAsc);
     Emitter createEmitter(Emitter emitter);
     Emitter updateEmitter(Long id, Emitter emitter);
     void deleteEmitter(Long id);

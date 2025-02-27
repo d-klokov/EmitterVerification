@@ -41,8 +41,8 @@ public class DefaultEmitterService implements EmitterService {
     }
 
     @Override
-    public Page<Emitter> getEmittersPage(int pageNumber) {
-        Sort sort = Sort.by("id").ascending();
+    public Page<Emitter> getEmittersPage(int pageNumber, int pageSize, String sortField, boolean sortAsc) {
+        Sort sort = sortAsc ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
 
         return emitterRepository.findAll(pageable);
