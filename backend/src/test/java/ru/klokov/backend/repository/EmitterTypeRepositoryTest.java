@@ -1,18 +1,14 @@
 package ru.klokov.backend.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.List;
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
 import ru.klokov.backend.model.EmitterType;
+
+import java.util.List;
 
 @DataJpaTest
 class EmitterTypeRepositoryTest {
@@ -38,8 +34,8 @@ class EmitterTypeRepositoryTest {
         List<EmitterType> obtainedEmitterTypes = emitterTypeRepository.findAll();
 
         // then
-        assertNotNull(obtainedEmitterTypes);
-        assertEquals(savedEmitterTypesList.size(), obtainedEmitterTypes.size());
+        Assertions.assertNotNull(obtainedEmitterTypes);
+        Assertions.assertEquals(savedEmitterTypesList.size(), obtainedEmitterTypes.size());
     }
 
     @Test
@@ -53,8 +49,8 @@ class EmitterTypeRepositoryTest {
         EmitterType obtainedEmitterType = emitterTypeRepository.findById(emitterType.getId()).orElse(null);
 
         // then
-        assertNotNull(obtainedEmitterType);
-        assertEquals(savedEmitterType.getName(), obtainedEmitterType.getName());
+        Assertions.assertNotNull(obtainedEmitterType);
+        Assertions.assertEquals(savedEmitterType.getName(), obtainedEmitterType.getName());
     }
 
     @Test
@@ -67,7 +63,7 @@ class EmitterTypeRepositoryTest {
         EmitterType obtainedEmitterType = emitterTypeRepository.findById(emitterType.getId()).orElse(null);
 
         // then
-        assertNull(obtainedEmitterType);
+        Assertions.assertNull(obtainedEmitterType);
     }
 
     @Test
@@ -82,8 +78,8 @@ class EmitterTypeRepositoryTest {
         EmitterType createdEmitterType = emitterTypeRepository.findById(emitterTypeToSave.getId()).orElse(null);
 
         // then
-        assertNotNull(createdEmitterType);
-        assertEquals(emitterTypeToSave.getId(), createdEmitterType.getId());
+        Assertions.assertNotNull(createdEmitterType);
+        Assertions.assertEquals(emitterTypeToSave.getId(), createdEmitterType.getId());
     }
 
     @Test
@@ -96,13 +92,14 @@ class EmitterTypeRepositoryTest {
 
         // when
         EmitterType obtainedEmitterType = emitterTypeRepository.findById(savedEmitterType.getId()).orElse(null);
+        assert obtainedEmitterType != null;
         obtainedEmitterType.setName(updatedName);
 
         EmitterType updatedEmitterType = emitterTypeRepository.save(obtainedEmitterType);
 
         // then
-        assertNotNull(updatedEmitterType);
-        assertEquals(updatedName, updatedEmitterType.getName());
+        Assertions.assertNotNull(updatedEmitterType);
+        Assertions.assertEquals(updatedName, updatedEmitterType.getName());
     }
 
     @Test
@@ -118,6 +115,6 @@ class EmitterTypeRepositoryTest {
 
         // then
         EmitterType obtainedEmitterType = emitterTypeRepository.findById(emitterType.getId()).orElse(null);
-        assertNull(obtainedEmitterType);
+        Assertions.assertNull(obtainedEmitterType);
     }   
 }

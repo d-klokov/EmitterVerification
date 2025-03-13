@@ -1,18 +1,5 @@
 package ru.klokov.backend.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,17 +7,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
-
 import ru.klokov.backend.exception.ApiException;
 import ru.klokov.backend.model.EmitterOwner;
 import ru.klokov.backend.repository.EmitterOwnerRepository;
 import ru.klokov.backend.service.implementation.DefaultEmitterOwnerService;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class EmitterOwnerServiceTest {
@@ -61,7 +53,7 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.findAll()).willReturn(List.of(emitterOwner, secondEmitterOwner, thirdEmitterOwner));
 
         // when
-        List<EmitterOwner> obtainedEmitterOwners = emitterOwnerService.getAllOwners();
+        List<EmitterOwner> obtainedEmitterOwners = emitterOwnerService.getAllEmitterOwners();
 
         // then
         assertNotNull(obtainedEmitterOwners);
@@ -75,7 +67,7 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.findById(anyLong())).willReturn(Optional.of(emitterOwner));
 
         // when
-        EmitterOwner obtainedEmitterOwner = emitterOwnerService.getOwnerById(1L);
+        EmitterOwner obtainedEmitterOwner = emitterOwnerService.getEmitterOwnerById(1L);
 
         // then
         assertNotNull(obtainedEmitterOwner);
@@ -89,9 +81,9 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterOwnerService.getOwnerById(1L);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterOwnerService.getEmitterOwnerById(1L)
+        );
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
@@ -107,7 +99,7 @@ class EmitterOwnerServiceTest {
         // when
         given(emitterOwnerRepository.findAll(pageable)).willReturn(mockPage);
 
-        Page<EmitterOwner> emitterOwnersPage = emitterOwnerService.getOwnersPage(1, 5, "id", true);
+        Page<EmitterOwner> emitterOwnersPage = emitterOwnerService.getEmitterOwnersPage(1, 5, "id", true);
 
         // then
         assertNotNull(emitterOwnersPage);
@@ -121,7 +113,7 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.save(any(EmitterOwner.class))).willReturn(emitterOwner);
 
         // when
-        EmitterOwner createdEmitterOwner = emitterOwnerService.createOwner(emitterOwner);
+        EmitterOwner createdEmitterOwner = emitterOwnerService.createEmitterOwner(emitterOwner);
 
         // then
         assertNotNull(createdEmitterOwner);
@@ -135,9 +127,9 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.save(any(EmitterOwner.class))).willThrow(conflictException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterOwnerService.createOwner(emitterOwner);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterOwnerService.createEmitterOwner(emitterOwner)
+        );
 
         // then
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
@@ -153,7 +145,7 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.save(any(EmitterOwner.class))).willReturn(updatedEmitterOwner);
 
         // when
-        emitterOwnerService.updateOwner(emitterOwner.getId(), updatedEmitterOwner);
+        emitterOwnerService.updateEmitterOwner(emitterOwner.getId(), updatedEmitterOwner);
 
         // then
         assertNotNull(updatedEmitterOwner);
@@ -170,9 +162,9 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterOwnerService.updateOwner(emitterOwnerToUpdateId, updatedEmitterOwner);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterOwnerService.updateEmitterOwner(emitterOwnerToUpdateId, updatedEmitterOwner)
+        );
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
@@ -189,9 +181,9 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.save(any(EmitterOwner.class))).willThrow(conflictException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterOwnerService.updateOwner(emitterOwnerToUpdateId, updatedEmitterOwner);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterOwnerService.updateEmitterOwner(emitterOwnerToUpdateId, updatedEmitterOwner)
+        );
 
         // then
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
@@ -204,7 +196,7 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.findById(anyLong())).willReturn(Optional.of(emitterOwner));
 
         // when
-        emitterOwnerService.deleteOwner(emitterOwner.getId());
+        emitterOwnerService.deleteEmitterOwner(emitterOwner.getId());
 
         // then
         verify(emitterOwnerRepository, times(1)).deleteById(anyLong());
@@ -219,9 +211,9 @@ class EmitterOwnerServiceTest {
         given(emitterOwnerRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterOwnerService.deleteOwner(emitterOwnerToDeleteId);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterOwnerService.deleteEmitterOwner(emitterOwnerToDeleteId)
+        );
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());

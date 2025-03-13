@@ -1,36 +1,25 @@
 package ru.klokov.backend.controller;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 import ru.klokov.backend.dto.PagedResponse;
 import ru.klokov.backend.dto.emitterowner.EmitterOwnerRequest;
 import ru.klokov.backend.dto.emitterowner.EmitterOwnerResponse;
 import ru.klokov.backend.exception.ApiException;
 import ru.klokov.backend.model.EmitterOwner;
 import ru.klokov.backend.service.EmitterOwnerService;
+import ru.klokov.backend.utils.PageUtils;
 
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PutMapping;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -38,41 +27,33 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequiredArgsConstructor
 public class EmitterOwnerController {
 
-    private final EmitterOwnerService ownerService;
+    private final EmitterOwnerService emitterOwnerService;
     private final ModelMapper mapper;
+    private final PageUtils pageUtils;
 
     @GetMapping
-    public ResponseEntity<PagedResponse<EmitterOwnerResponse>> getAllOwners(
+    public ResponseEntity<PagedResponse<EmitterOwnerResponse>> getAllEmitterOwners(
             @RequestParam(value = "page", required = false) String page,
             @RequestParam(value = "size", required = false) String size,
             @RequestParam(value = "field", required = false) String field,
-            @RequestParam(value = "asc", required = false) String asc) {
+            @RequestParam(value = "direction", required = false) String direction) {
 
-        List<EmitterOwnerResponse> ownersList = new ArrayList<>();
+        List<EmitterOwnerResponse> emitterOwnersList = new ArrayList<>();
 
-        int pageNumber = 1;
-        int pageSize = 5;
-        String sortField = "id";
-        boolean sortDirection = true;
+        Page<EmitterOwner> responsePage = emitterOwnerService.getEmitterOwnersPage(
+                pageUtils.getPageNumber(page),
+                pageUtils.getPageSize(size),
+                pageUtils.getPageSortField(field),
+                pageUtils.getPageSortDirection(direction)
+        );
 
-        if (page != null && !page.isBlank())
-            pageNumber = Integer.parseInt(page);
-        if (size != null && !size.isBlank())
-            pageSize = Integer.parseInt(size);
-        if (field != null && !field.isBlank())
-            sortField = String.valueOf(sortField);
-        if (asc != null && !asc.isBlank())
-            sortDirection = Boolean.parseBoolean(asc);
-
-        Page<EmitterOwner> responsePage = ownerService.getOwnersPage(pageNumber, pageSize, sortField, sortDirection);
-
-        responsePage
-                .forEach(owner -> ownersList.add(mapper.map(owner, EmitterOwnerResponse.class)));
+        responsePage.forEach(emitterOwner ->
+                emitterOwnersList.add(mapper.map(emitterOwner, EmitterOwnerResponse.class)));
 
         PagedResponse<EmitterOwnerResponse> response = new PagedResponse<>(
                 responsePage.getNumber(),
                 responsePage.getTotalPages(),
-                ownersList);
+                emitterOwnersList);
 
         return ResponseEntity.ok(response);
 
@@ -80,7 +61,7 @@ public class EmitterOwnerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EmitterOwnerResponse> getOwnerById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(mapper.map(ownerService.getOwnerById(id), EmitterOwnerResponse.class));
+        return ResponseEntity.ok(mapper.map(emitterOwnerService.getEmitterOwnerById(id), EmitterOwnerResponse.class));
     }
 
     @PostMapping
@@ -95,8 +76,8 @@ public class EmitterOwnerController {
                 throw new ApiException(HttpStatus.BAD_REQUEST, error.getDefaultMessage(), Instant.now());
         }
 
-        EmitterOwner owner = ownerService
-                .createOwner(mapper.map(ownerRequest, EmitterOwner.class));
+        EmitterOwner owner = emitterOwnerService
+                .createEmitterOwner(mapper.map(ownerRequest, EmitterOwner.class));
 
         return new ResponseEntity<>(mapper.map(owner, EmitterOwnerResponse.class), HttpStatus.CREATED);
 
@@ -114,18 +95,16 @@ public class EmitterOwnerController {
                 throw new ApiException(HttpStatus.BAD_REQUEST, error.getDefaultMessage(), Instant.now());
         }
 
-        EmitterOwner ownerToUpdate = ownerService.getOwnerById(id);
+        EmitterOwner emitterOwnerToUpdate = mapper.map(ownerRequest, EmitterOwner.class);
 
-        ownerToUpdate.setName(ownerRequest.getName());
-
-        EmitterOwner updatedEmitterOwner = ownerService.updateOwner(id, ownerToUpdate);
+        EmitterOwner updatedEmitterOwner = emitterOwnerService.updateEmitterOwner(id, emitterOwnerToUpdate);
 
         return ResponseEntity.ok(mapper.map(updatedEmitterOwner, EmitterOwnerResponse.class));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOwner(@PathVariable("id") Long id) {
-        ownerService.deleteOwner(id);
+        emitterOwnerService.deleteEmitterOwner(id);
         return ResponseEntity.ok(String.format("Владелец с id = %d успешно удален", id));
     }
 
