@@ -1,7 +1,6 @@
 package ru.klokov.backend.service.implementation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,9 +21,6 @@ import java.util.List;
 public class DefaultEmitterService implements EmitterService {
 
     private final EmitterRepository emitterRepository;
-
-    @Value("${page.size}")
-    private int pageSize;
 
     @Override
     public List<Emitter> getAllEmitters() {
@@ -79,10 +75,8 @@ public class DefaultEmitterService implements EmitterService {
 
         emitterToUpdate.setMinimumPulseFrequency10(emitter.getMinimumPulseFrequency10());
         emitterToUpdate.setMaximumPulseFrequency10(emitter.getMaximumPulseFrequency10());
-
         emitterToUpdate.setMinimumPulseFrequency100(emitter.getMinimumPulseFrequency100());
         emitterToUpdate.setMaximumPulseFrequency100(emitter.getMaximumPulseFrequency100());
-
         emitterToUpdate.setMinimumPulseFrequency1000(emitter.getMinimumPulseFrequency1000());
         emitterToUpdate.setMaximumPulseFrequency1000(emitter.getMaximumPulseFrequency1000());
 
