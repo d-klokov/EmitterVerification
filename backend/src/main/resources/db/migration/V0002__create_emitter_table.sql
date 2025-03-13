@@ -1,33 +1,48 @@
-create table if not exists emitter (
-    id bigserial primary key,
-    factory_number varchar(50) not null unique,
-    manufacture_date date not null,
-    verification_periodicity_in_months integer not null,
-    for_external_use bool not null,
-    has_internal_generator bool,
+CREATE TABLE emitter (
+    id BIGSERIAL PRIMARY KEY,
 
-    minimum_pulse_width double precision not null,
-    maximum_pulse_width double precision not null,
+    factory_number VARCHAR(255) NOT NULL UNIQUE,
+    manufacture_date DATE NOT NULL,
+    verification_periodicity_in_months INTEGER NOT NULL,
+    for_external_use bool NOT NULL,
+    has_internal_generator BOOLEAN NOT NULL,
 
-    minimum_pulse_frequency_10 double precision,
-    maximum_pulse_frequency_10 double precision,
-    minimum_pulse_frequency_100 double precision,
-    maximum_pulse_frequency_100 double precision,
-    minimum_pulse_frequency_1000 double precision not null,
-    maximum_pulse_frequency_1000 double precision not null,
+    minimum_pulse_width DOUBLE PRECISION NOT NULL,
+    maximum_pulse_width DOUBLE PRECISION NOT NULL,
 
-    minimum_pulse_power double precision not null,
-    maximum_pulse_power double precision not null,
+    minimum_pulse_frequency_10 DOUBLE PRECISION,
+    maximum_pulse_frequency_10 DOUBLE PRECISION,
+    minimum_pulse_frequency_100 DOUBLE PRECISION,
+    maximum_pulse_frequency_100 DOUBLE PRECISION,
+    minimum_pulse_frequency_1000 DOUBLE PRECISION,
+    maximum_pulse_frequency_1000 DOUBLE PRECISION,
 
-    minimum_radiation_flux_divergence_angle double precision not null,
-    maximum_radiation_flux_divergence_angle double precision not null,
+    minimum_pulse_power DOUBLE PRECISION NOT NULL,
+    maximum_pulse_power DOUBLE PRECISION NOT NULL,
 
-    minimum_non_parallelism_of_the_optical_and_construction_axis double precision not null,
-    maximum_non_parallelism_of_the_optical_and_construction_axis double precision not null,
+    minimum_radiation_flux_divergence_angle DOUBLE PRECISION NOT NULL,
+    maximum_radiation_flux_divergence_angle DOUBLE PRECISION NOT NULL,
 
-    minimum_unevenness_of_radiation_flux double precision not null,
-    maximum_unevenness_of_radiation_flux double precision not null,
+    minimum_non_parallelism_of_the_optical_and_construction_axis DOUBLE PRECISION NOT NULL,
+    maximum_non_parallelism_of_the_optical_and_construction_axis DOUBLE PRECISION NOT NULL,
 
-    emitter_type_id bigserial references emitter_type(id),
-    emitter_owner_id bigserial references emitter_owner(id)
+    minimum_unevenness_of_radiation_flux DOUBLE PRECISION NOT NULL,
+    maximum_unevenness_of_radiation_flux DOUBLE PRECISION NOT NULL,
+
+    emitter_type_id BIGSERIAL NOT NULL REFERENCES emitter_type(id),
+    emitter_owner_id BIGSERIAL NOT NULL REFERENCES emitter_owner(id)
+
+    CHECK(
+        (has_internal_generator = FALSE AND
+            minimum_pulse_frequency_10 IS NOT NULL AND maximum_pulse_frequency_10 IS NOT NULL AND
+            minimum_pulse_frequency_100 IS NOT NULL AND maximum_pulse_frequency_100 IS NOT NULL AND
+            minimum_pulse_frequency_1000 IS NOT NULL AND maximum_pulse_frequency_1000 IS NOT NULL
+        )
+        OR
+        (has_internal_generator = TRUE AND
+            minimum_pulse_frequency_10 IS NULL AND maximum_pulse_frequency_10 IS NULL AND
+            minimum_pulse_frequency_100 IS NULL AND maximum_pulse_frequency_100 IS NULL AND
+            minimum_pulse_frequency_1000 IS NULL AND maximum_pulse_frequency_1000 IS NULL
+        )
+    )
 );

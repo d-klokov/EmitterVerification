@@ -1,9 +1,9 @@
-create table if not exists emitter_type (
-    id bigserial primary key,
-    type_name varchar(50) not null unique
+CREATE TABLE emitter_type (
+    id BIGSERIAL PRIMARY KEY,
+    type_name VARCHAR(255) NOT NULL UNIQUE
 );
 
-create table if not exists emitter_owner (
-    id bigserial primary key,
-    owner_name varchar(50) not null unique
+CREATE TABLE emitter_owner (
+    id BIGSERIAL PRIMARY KEY,
+    owner_name VARCHAR(255) NOT NULL UNIQUE
 );
