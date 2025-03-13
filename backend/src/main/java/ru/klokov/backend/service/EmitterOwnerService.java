@@ -1,21 +1,20 @@
 package ru.klokov.backend.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
-
 import ru.klokov.backend.model.EmitterOwner;
 
+import java.util.List;
+
 public interface EmitterOwnerService {
-    List<EmitterOwner> getAllOwners();
+    List<EmitterOwner> getAllEmitterOwners();
 
-    EmitterOwner getOwnerById(Long id);
+    EmitterOwner getEmitterOwnerById(Long id);
 
-    Page<EmitterOwner> getOwnersPage(int pageNumber, int pageSize, String sortField, boolean sortAsc);
+    Page<EmitterOwner> getEmitterOwnersPage(int pageNumber, int pageSize, String sortField, boolean sortAsc);
 
-    EmitterOwner createOwner(EmitterOwner owner);
+    EmitterOwner createEmitterOwner(EmitterOwner owner);
 
-    EmitterOwner updateOwner(Long id, EmitterOwner owner);
+    EmitterOwner updateEmitterOwner(Long id, EmitterOwner owner);
 
-    void deleteOwner(Long id);
+    void deleteEmitterOwner(Long id);
 }

@@ -20,6 +20,11 @@ spring:
         format-sql: true
 
 page:
-  size: 5
-measurements:
-  default: 21
+  default:
+    number: 1
+    size: 5
+    sort:
+      field: "id"
+      direction: true
+#measurements:
+#  default: 21

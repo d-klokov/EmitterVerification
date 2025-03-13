@@ -1,22 +1,21 @@
 package ru.klokov.backend.service.implementation;
 
-import java.time.Instant;
-import java.util.List;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import ru.klokov.backend.exception.ApiException;
 import ru.klokov.backend.model.EmitterType;
 import ru.klokov.backend.repository.EmitterTypeRepository;
 import ru.klokov.backend.service.EmitterTypeService;
+
+import java.time.Instant;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -39,7 +38,9 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
                 () -> new ApiException(
                         HttpStatus.NOT_FOUND,
                         String.format("Тип излучателя с идентификатором %d не найден", id),
-                        Instant.now()));
+                        Instant.now()
+                )
+        );
     }
 
     @Override
@@ -78,7 +79,7 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
         EmitterType emitterTypeToUpdate = emitterTypeRepository.findById(id).orElseThrow(
                 () -> new ApiException(
                         HttpStatus.NOT_FOUND,
-                        String.format("Из type with id=%d not found", id),
+                        String.format("Emitter type with id=%d not found", id),
                         Instant.now()));
 
         emitterTypeToUpdate.setName(emitterType.getName());

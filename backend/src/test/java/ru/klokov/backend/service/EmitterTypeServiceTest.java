@@ -6,31 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import ru.klokov.backend.exception.ApiException;
 import ru.klokov.backend.model.EmitterType;
 import ru.klokov.backend.repository.EmitterTypeRepository;
 import ru.klokov.backend.service.implementation.DefaultEmitterTypeService;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class EmitterTypeServiceTest {
@@ -43,8 +35,8 @@ class EmitterTypeServiceTest {
 
     private EmitterType emitterType;
 
-    private ApiException notFoundException = new ApiException(HttpStatus.NOT_FOUND);
-    private ApiException conflictException = new ApiException(HttpStatus.CONFLICT);
+    private final ApiException notFoundException = new ApiException(HttpStatus.NOT_FOUND);
+    private final ApiException conflictException = new ApiException(HttpStatus.CONFLICT);
 
     @BeforeEach
     public void setUp() {
@@ -89,9 +81,9 @@ class EmitterTypeServiceTest {
         given(emitterTypeRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.getEmitterTypeById(1L);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterTypeService.getEmitterTypeById(1L)
+        );
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
@@ -135,9 +127,9 @@ class EmitterTypeServiceTest {
         given(emitterTypeRepository.save(any(EmitterType.class))).willThrow(conflictException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.createEmitterType(emitterType);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterTypeService.createEmitterType(emitterType)
+        );
 
         // then
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
@@ -170,9 +162,9 @@ class EmitterTypeServiceTest {
         given(emitterTypeRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.updateEmitterType(emitterTypeToUpdateId, updatedEmitterType);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterTypeService.updateEmitterType(emitterTypeToUpdateId, updatedEmitterType)
+        );
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
@@ -189,9 +181,9 @@ class EmitterTypeServiceTest {
         given(emitterTypeRepository.save(any(EmitterType.class))).willThrow(conflictException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.updateEmitterType(emitterTypeToUpdateId, updatedEmitterType);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterTypeService.updateEmitterType(emitterTypeToUpdateId, updatedEmitterType)
+        );
 
         // then
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
@@ -219,9 +211,9 @@ class EmitterTypeServiceTest {
         given(emitterTypeRepository.findById(anyLong())).willThrow(notFoundException);
 
         // when
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            emitterTypeService.deleteEmitterType(emitterTypeToDeleteId);
-        });
+        ApiException exception = assertThrows(ApiException.class, () ->
+            emitterTypeService.deleteEmitterType(emitterTypeToDeleteId)
+        );
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
