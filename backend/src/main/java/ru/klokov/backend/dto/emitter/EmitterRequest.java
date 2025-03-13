@@ -1,6 +1,9 @@
 package ru.klokov.backend.dto.emitter;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,7 +17,7 @@ import java.time.LocalDate;
 @Builder
 public class EmitterRequest {
     @NotBlank(message = "Заполните поле \"заводской номер\"!")
-    @Size(min = 2, max = 10, message = "Заводской номер излучателя должен состоять минимум из 2 и максимум из 10 символов!")
+    @Size(min = 2, max = 255, message = "Заводской номер излучателя должен состоять минимум из 2 и максимум из 255 символов!")
     private String factoryNumber;
 
     @NotNull(message = "Заполните поле \"дата изготовления\"!")
@@ -25,10 +28,10 @@ public class EmitterRequest {
     @NotNull(message = "Заполните поле \"периодичность проверки\"!")
     private Integer verificationPeriodicityInMonths;
 
-    @NotBlank(message = "Заполните поле \"для внутреннего/внешнего использования\"!")
+    @NotNull(message = "Поле \"Для внешнего использования\" не может быть пустым!")
     private Boolean forExternalUse;
 
-    @NotBlank(message = "Заполните поле \"наличие внутреннего генератора\"!")
+    @NotNull(message = "Поле \"Есть внутренний генератор\" не может быть пустым!")
     private Boolean hasInternalGenerator;
 
     @NotNull(message = "Заполните поле \"минимальная длительность импульса\"!")
@@ -36,19 +39,11 @@ public class EmitterRequest {
     @NotNull(message = "Заполните поле \"максимальная длительность импульса\"!")
     private Double maximumPulseWidth;
 
-    @NotNull(message = "Заполните поле \"минимальная частота импульса (10 Гц)\"!")
     private Double minimumPulseFrequency10;
-    @NotNull(message = "Заполните поле \"максимальная частота импульса (10 Гц)\"!")
     private Double maximumPulseFrequency10;
-
-    @NotNull(message = "Заполните поле \"минимальная частота импульса (100 Гц)\"!")
     private Double minimumPulseFrequency100;
-    @NotNull(message = "Заполните поле \"максимальная частота импульса (100 Гц)\"!")
     private Double maximumPulseFrequency100;
-
-    @NotNull(message = "Заполните поле \"минимальная частота импульса (1000 Гц)\"!")
     private Double minimumPulseFrequency1000;
-    @NotNull(message = "Заполните поле \"максимальная частота импульса (1000 Гц)\"!")
     private Double maximumPulseFrequency1000;
 
     @NotNull(message = "Заполните поле \"минимальное значение импульсной мощности\"!")

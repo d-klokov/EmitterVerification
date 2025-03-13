@@ -2,11 +2,26 @@ package ru.klokov.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Check;
+import org.springframework.http.HttpStatus;
+import ru.klokov.backend.exception.ApiException;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "emitter")
+@Check(constraints = """
+        (has_internal_generator = FALSE AND
+            minimum_pulse_frequency_10 IS NOT NULL AND maximum_pulse_frequency_10 IS NOT NULL AND
+            minimum_pulse_frequency_100 IS NOT NULL AND maximum_pulse_frequency_100 IS NOT NULL AND
+            minimum_pulse_frequency_1000 IS NOT NULL AND maximum_pulse_frequency_1000 IS NOT NULL)
+        OR
+        (has_internal_generator = TRUE
+            minimum_pulse_frequency_10 IS NULL AND maximum_pulse_frequency_10 IS NULL AND
+            minimum_pulse_frequency_100 IS NULL AND maximum_pulse_frequency_100 IS NULL AND
+            minimum_pulse_frequency_1000 IS NULL AND maximum_pulse_frequency_1000 IS NULL)
+        """)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,7 +47,7 @@ public class Emitter {
     private Boolean forExternalUse;
 
     @Column(name = "has_internal_generator", nullable = false)
-    private Boolean hasInternalGenerator;
+    protected Boolean hasInternalGenerator;
 
     @Column(name = "minimum_pulse_width", nullable = false)
     private Double minimumPulseWidth;
@@ -43,12 +58,10 @@ public class Emitter {
     private Double minimumPulseFrequency10;
     @Column(name = "maximum_pulse_frequency_10")
     private Double maximumPulseFrequency10;
-
     @Column(name = "minimum_pulse_frequency_100")
     private Double minimumPulseFrequency100;
     @Column(name = "maximum_pulse_frequency_100")
     private Double maximumPulseFrequency100;
-
     @Column(name = "minimum_pulse_frequency_1000", nullable = false)
     private Double minimumPulseFrequency1000;
     @Column(name = "maximum_pulse_frequency_1000", nullable = false)
@@ -85,5 +98,83 @@ public class Emitter {
     // TODO: verifications
     // @OneToMany(mappedBy = "emitter")
     // private List<Verification> verifications = new ArrayList<>();
-}
 
+    @PrePersist
+    @PreUpdate
+    private void validateEmitter() {
+        if (!hasInternalGenerator) {
+            if (minimumPulseFrequency10 == null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заполните поле \"Минимальная допутимая частота внешнего генератора (10 Гц)\"",
+                    Instant.now()
+            );
+
+            if (maximumPulseFrequency10 == null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заполните поле \"Максимальная допутимая частота внешнего генератора (10 Гц)\"",
+                    Instant.now()
+            );
+
+            if (minimumPulseFrequency100 == null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заполните поле \"Минимальная допутимая частота внешнего генератора (100 Гц)\"",
+                    Instant.now()
+            );
+
+            if (maximumPulseFrequency100 == null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заполните поле \"Максимальная допутимая частота внешнего генератора (100 Гц)\"",
+                    Instant.now()
+            );
+
+            if (minimumPulseFrequency1000 == null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заполните поле \"Минимальная допутимая частота внешнего генератора (1000 Гц)\"",
+                    Instant.now()
+            );
+
+            if (maximumPulseFrequency1000 == null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Заполните поле \"Максимальная допутимая частота внешнего генератора (1000 Гц)\"",
+                    Instant.now()
+            );
+        } else {
+            if (minimumPulseFrequency10 != null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Для излучателя с внутренним генератором поле \"Минимальная допутимая частота внешнего генератора (10 Гц)\" должно быть пустым!",
+                    Instant.now()
+            );
+
+            if (maximumPulseFrequency10 != null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Для излучателя с внутренним генератором поле \"Максимальная допутимая частота внешнего генератора (10 Гц)\" должно быть пустым!",
+                    Instant.now()
+            );
+
+            if (minimumPulseFrequency100 != null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Для излучателя с внутренним генератором поле \"Минимальная допутимая частота внешнего генератора (100 Гц)\" должно быть пустым!",
+                    Instant.now()
+            );
+
+            if (maximumPulseFrequency100 != null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Для излучателя с внутренним генератором поле \"Максимальная допутимая частота внешнего генератора (100 Гц)\" должно быть пустым!",
+                    Instant.now()
+            );
+
+            if (minimumPulseFrequency1000 != null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Для излучателя с внутренним генератором поле \"Минимальная допутимая частота внешнего генератора (1000 Гц)\" должно быть пустым!",
+                    Instant.now()
+            );
+
+            if (maximumPulseFrequency1000 != null) throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Для излучателя с внутренним генератором поле \"Максимальная допутимая частота внешнего генератора (1000 Гц)\" должно быть пустым!",
+                    Instant.now()
+            );
+        }
+
+    }
+}
