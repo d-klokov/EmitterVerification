@@ -1,18 +1,6 @@
 package ru.klokov.backend.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.time.Instant;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -25,19 +13,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.hamcrest.CoreMatchers.*;
-
 import ru.klokov.backend.dto.emitterowner.EmitterOwnerRequest;
 import ru.klokov.backend.dto.emitterowner.EmitterOwnerResponse;
 import ru.klokov.backend.exception.ApiException;
 import ru.klokov.backend.model.EmitterOwner;
 import ru.klokov.backend.service.EmitterOwnerService;
+import ru.klokov.backend.utils.PageUtils;
+
+import java.time.Instant;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EmitterOwnerController.class)
 class EmitterOwnerControllerTest {
@@ -56,26 +49,18 @@ class EmitterOwnerControllerTest {
     @MockBean
     private ModelMapper mapper;
 
-    private EmitterOwner emitterOwner;
+    @MockBean
+    private PageUtils pageUtils;
 
-    private EmitterOwnerRequest validEmitterOwnerRequest = new EmitterOwnerRequest("Type 1");
-    private EmitterOwnerRequest blankEmitterOwnerRequest = new EmitterOwnerRequest("   ");
-    private EmitterOwnerRequest invalidSizeEmitterOwnerRequest = new EmitterOwnerRequest("12");
+    private final EmitterOwner emitterOwner = EmitterOwner.builder().id(1L).name("Owner 1").build();
 
-    private EmitterOwnerResponse emitterOwnerResponse;
+    private final EmitterOwnerRequest validEmitterOwnerRequest = new EmitterOwnerRequest("Type 1");
+    private final EmitterOwnerRequest blankEmitterOwnerRequest = new EmitterOwnerRequest("   ");
+    private final EmitterOwnerRequest invalidSizeEmitterOwnerRequest = new EmitterOwnerRequest("12");
 
-    private Instant timestamp = Instant.now();
+    private final EmitterOwnerResponse emitterOwnerResponse = EmitterOwnerResponse.builder().id(1L).name("Owner 1").build();
 
-    private static final int PAGE_NUMBER = 1;
-    private static final int PAGE_SIZE = 5;
-    private static final String SORT_FIELD = "id";
-    private static final boolean SORT_ASCENDING = true;
-
-    @BeforeEach
-    public void setUp() {
-        emitterOwner = EmitterOwner.builder().id(1L).name("Owner 1").build();
-        emitterOwnerResponse = EmitterOwnerResponse.builder().id(1L).name("Owner 1").build();
-    }
+    private final Instant timestamp = Instant.now();
 
     @Test
     @DisplayName("Test get all emitter owners pageable functionality")
@@ -88,8 +73,18 @@ class EmitterOwnerControllerTest {
 
         Page<EmitterOwner> page = new PageImpl<>(emitterOwnersList);
 
-        given(emitterOwnerService.getOwnersPage(PAGE_NUMBER, PAGE_SIZE, SORT_FIELD, SORT_ASCENDING))
-                .willReturn(page);
+        given(pageUtils.getPageNumber(any())).willReturn(1);
+        given(pageUtils.getPageSize(any())).willReturn(5);
+        given(pageUtils.getPageSortField(any())).willReturn("id");
+        given(pageUtils.getPageSortDirection(any())).willReturn(true);
+
+        given(emitterOwnerService.getEmitterOwnersPage(
+                any(Integer.class),
+                any(Integer.class),
+                any(String.class),
+                any(Boolean.class))
+        ).willReturn(page);
+
         given(mapper.map(any(EmitterOwner.class), eq(EmitterOwnerResponse.class)))
                 .willReturn(emitterOwnerResponse);
 
@@ -100,7 +95,7 @@ class EmitterOwnerControllerTest {
         result
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pageNumber", is(PAGE_NUMBER - 1)))
+                .andExpect(jsonPath("$.pageNumber", is(0)))
                 .andExpect(jsonPath("$.content.length()", is(emitterOwnersList.size())));
     }
 
@@ -108,7 +103,7 @@ class EmitterOwnerControllerTest {
     @DisplayName("Test get emitter owner by id functionality (success)")
     void givenId_whenGetById_thenSuccessResponse() throws Exception {
         // given
-        given(emitterOwnerService.getOwnerById(anyLong())).willReturn(emitterOwner);
+        given(emitterOwnerService.getEmitterOwnerById(anyLong())).willReturn(emitterOwner);
         given(mapper.map(emitterOwner, EmitterOwnerResponse.class)).willReturn(emitterOwnerResponse);
 
         // when
@@ -126,7 +121,7 @@ class EmitterOwnerControllerTest {
     @DisplayName("Test get emitter owner by id functionality (not found)")
     void givenId_whenGetById_thenNotFoundResponse() throws Exception {
         // given
-        given(emitterOwnerService.getOwnerById(anyLong())).willThrow(new ApiException(
+        given(emitterOwnerService.getEmitterOwnerById(anyLong())).willThrow(new ApiException(
                 HttpStatus.NOT_FOUND,
                 String.format("Владелец излучателя с идентификатором %d не найден", emitterOwner.getId()),
                 timestamp));
@@ -153,7 +148,7 @@ class EmitterOwnerControllerTest {
         given(mapper.map(any(EmitterOwner.class), eq(EmitterOwnerResponse.class)))
                 .willReturn(emitterOwnerResponse);
 
-        given(emitterOwnerService.createOwner(any(EmitterOwner.class))).willReturn(emitterOwner);
+        given(emitterOwnerService.createEmitterOwner(any(EmitterOwner.class))).willReturn(emitterOwner);
 
         // when
         ResultActions result = mockMvc.perform(post(ENDPOINT)
@@ -172,7 +167,7 @@ class EmitterOwnerControllerTest {
     @DisplayName("Test create emitter owner functionality (blank input bad request)")
     void givenBlankEmitterOwnerRequest_whenCreate_thenBadRequestResponse() throws Exception {
         // given
-        given(emitterOwnerService.createOwner(any(EmitterOwner.class))).willThrow(new ApiException(
+        given(emitterOwnerService.createEmitterOwner(any(EmitterOwner.class))).willThrow(new ApiException(
                 HttpStatus.BAD_REQUEST,
                 "Заполните поле \"владелец\"!",
                 timestamp));
@@ -194,7 +189,7 @@ class EmitterOwnerControllerTest {
     @DisplayName("Test create emitter owner functionality (invalid size input bad request)")
     void givenInvalidSizeEmitterOwnerRequest_whenCreate_thenBadRequestResponse() throws Exception {
         // given
-        given(emitterOwnerService.createOwner(any(EmitterOwner.class))).willThrow(new ApiException(
+        given(emitterOwnerService.createEmitterOwner(any(EmitterOwner.class))).willThrow(new ApiException(
                 HttpStatus.BAD_REQUEST,
                 "Имя владельца должно состоять минимум из 3, и максимум из 50 символов!",
                 timestamp));
@@ -225,8 +220,8 @@ class EmitterOwnerControllerTest {
         given(mapper.map(any(EmitterOwner.class), eq(EmitterOwnerResponse.class)))
                 .willReturn(updatedEmitterOwnerResponse);
 
-        given(emitterOwnerService.getOwnerById(anyLong())).willReturn(emitterOwner);
-        given(emitterOwnerService.updateOwner(anyLong(), any(EmitterOwner.class)))
+        given(emitterOwnerService.getEmitterOwnerById(anyLong())).willReturn(emitterOwner);
+        given(emitterOwnerService.updateEmitterOwner(anyLong(), any(EmitterOwner.class)))
                 .willReturn(updatedEmitterOwner);
 
         // when
@@ -246,8 +241,8 @@ class EmitterOwnerControllerTest {
     @DisplayName("Test edit emitter owner functionality (blank input bad request)")
     void givenBlankEmitterOwnerRequest_whenEdit_thenBadRequestResponse() throws Exception {
         // given
-        given(emitterOwnerService.getOwnerById(anyLong())).willReturn(emitterOwner);
-        given(emitterOwnerService.updateOwner(anyLong(), any(EmitterOwner.class)))
+        given(emitterOwnerService.getEmitterOwnerById(anyLong())).willReturn(emitterOwner);
+        given(emitterOwnerService.updateEmitterOwner(anyLong(), any(EmitterOwner.class)))
                 .willThrow(new ApiException(
                         HttpStatus.BAD_REQUEST,
                         "Заполните поле \"владелец\"!",
@@ -270,8 +265,8 @@ class EmitterOwnerControllerTest {
     @DisplayName("Test edit emitter owner functionality (invalid size input bad request)")
     void givenInvalidSizeEmitterOwnerRequest_whenEdit_thenBadRequestResponse() throws Exception {
         // given
-        given(emitterOwnerService.getOwnerById(anyLong())).willReturn(emitterOwner);
-        given(emitterOwnerService.updateOwner(anyLong(), any(EmitterOwner.class)))
+        given(emitterOwnerService.getEmitterOwnerById(anyLong())).willReturn(emitterOwner);
+        given(emitterOwnerService.updateEmitterOwner(anyLong(), any(EmitterOwner.class)))
                 .willThrow(new ApiException(
                         HttpStatus.BAD_REQUEST,
                         "Имя владельца должно состоять минимум из 3, и максимум из 50 символов!",
@@ -295,14 +290,14 @@ class EmitterOwnerControllerTest {
     @DisplayName("Test delete emitter owner functionality (success)")
     void givenId_whenDelete_thenSuccessResponse() throws Exception {
         // given
-        doNothing().when(emitterOwnerService).deleteOwner(anyLong());
+        doNothing().when(emitterOwnerService).deleteEmitterOwner(anyLong());
 
         // when
         ResultActions result = mockMvc.perform(delete(ENDPOINT + "/{id}", emitterOwner.getId())
                 .contentType(MediaType.APPLICATION_JSON));
 
         // then
-        verify(emitterOwnerService, times(1)).deleteOwner(anyLong());
+        verify(emitterOwnerService, times(1)).deleteEmitterOwner(anyLong());
         result
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -317,14 +312,14 @@ class EmitterOwnerControllerTest {
         doThrow(new ApiException(
                 HttpStatus.NOT_FOUND,
                 String.format("Владелец излучателя с идентификатором %d не найден", emitterOwner.getId()),
-                Instant.now())).when(emitterOwnerService).deleteOwner(anyLong());
+                Instant.now())).when(emitterOwnerService).deleteEmitterOwner(anyLong());
 
         // when
         ResultActions result = mockMvc.perform(delete(ENDPOINT + "/{id}", emitterOwner.getId())
                 .contentType(MediaType.APPLICATION_JSON));
 
         // then
-        verify(emitterOwnerService, times(1)).deleteOwner(anyLong());
+        verify(emitterOwnerService, times(1)).deleteEmitterOwner(anyLong());
         result
                 .andDo(print())
                 .andExpect(status().isNotFound())
