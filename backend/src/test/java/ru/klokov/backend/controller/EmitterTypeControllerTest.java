@@ -1,18 +1,6 @@
 package ru.klokov.backend.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.time.Instant;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -25,19 +13,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.hamcrest.CoreMatchers.*;
-
 import ru.klokov.backend.dto.emittertype.EmitterTypeRequest;
 import ru.klokov.backend.dto.emittertype.EmitterTypeResponse;
 import ru.klokov.backend.exception.ApiException;
 import ru.klokov.backend.model.EmitterType;
 import ru.klokov.backend.service.EmitterTypeService;
+import ru.klokov.backend.utils.PageUtils;
+
+import java.time.Instant;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EmitterTypeController.class)
 class EmitterTypeControllerTest {
@@ -56,26 +49,18 @@ class EmitterTypeControllerTest {
         @MockBean
         private ModelMapper mapper;
 
-        private EmitterType emitterType;
+        @MockBean
+        private PageUtils pageUtils;
 
-        private EmitterTypeRequest validEmitterTypeRequest = new EmitterTypeRequest("Type 1");
-        private EmitterTypeRequest blankEmitterTypeRequest = new EmitterTypeRequest("   ");
-        private EmitterTypeRequest invalidSizeEmitterTypeRequest = new EmitterTypeRequest("12");
+        private final EmitterType emitterType = EmitterType.builder().id(1L).name("Type 1").build();
 
-        private EmitterTypeResponse emitterTypeResponse;
+        private final EmitterTypeRequest validEmitterTypeRequest = new EmitterTypeRequest("Type 1");
+        private final EmitterTypeRequest blankEmitterTypeRequest = new EmitterTypeRequest("   ");
+        private final EmitterTypeRequest invalidSizeEmitterTypeRequest = new EmitterTypeRequest("12");
 
-        private Instant timestamp = Instant.now();
+        private final EmitterTypeResponse emitterTypeResponse = EmitterTypeResponse.builder().id(1L).name("Type 1").build();
 
-        private static final int PAGE_NUMBER = 1;
-        private static final int PAGE_SIZE = 5;
-        private static final String SORT_FIELD = "id";
-        private static final boolean SORT_ASCENDING = true;
-
-        @BeforeEach
-        public void setUp() {
-                emitterType = EmitterType.builder().id(1L).name("Type 1").build();
-                emitterTypeResponse = EmitterTypeResponse.builder().id(1L).name("Type 1").build();
-        }
+        private final Instant timestamp = Instant.now();
 
         @Test
         @DisplayName("Test get all emitter types pageable functionality")
@@ -88,20 +73,30 @@ class EmitterTypeControllerTest {
 
                 Page<EmitterType> page = new PageImpl<>(emitterTypesList);
 
-                given(emitterTypeService.getEmitterTypesPage(PAGE_NUMBER, PAGE_SIZE, SORT_FIELD, SORT_ASCENDING))
-                                .willReturn(page);
+                given(pageUtils.getPageNumber(any())).willReturn(1);
+                given(pageUtils.getPageSize(any())).willReturn(5);
+                given(pageUtils.getPageSortField(any())).willReturn("id");
+                given(pageUtils.getPageSortDirection(any())).willReturn(true);
+
+                given(emitterTypeService.getEmitterTypesPage(
+                        any(Integer.class),
+                        any(Integer.class),
+                        any(String.class),
+                        any(Boolean.class))
+                ).willReturn(page);
+
                 given(mapper.map(any(EmitterType.class), eq(EmitterTypeResponse.class)))
-                                .willReturn(emitterTypeResponse);
+                        .willReturn(emitterTypeResponse);
 
                 // when
                 ResultActions result = mockMvc.perform(get(ENDPOINT).contentType(MediaType.APPLICATION_JSON));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.pageNumber", is(PAGE_NUMBER - 1)))
-                                .andExpect(jsonPath("$.content.length()", is(emitterTypesList.size())));
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.pageNumber", is(0)))
+                        .andExpect(jsonPath("$.content.length()", is(emitterTypesList.size())));
         }
 
         @Test
@@ -113,13 +108,13 @@ class EmitterTypeControllerTest {
 
                 // when
                 ResultActions result = mockMvc.perform(
-                                get(ENDPOINT + "/{id}", emitterType.getId()).contentType(MediaType.APPLICATION_JSON));
+                        get(ENDPOINT + "/{id}", emitterType.getId()).contentType(MediaType.APPLICATION_JSON));
 
                 // then
                 result
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").value(emitterTypeResponse.getId()))
-                                .andExpect(jsonPath("$.name").value(emitterTypeResponse.getName()));
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.id").value(emitterTypeResponse.getId()))
+                        .andExpect(jsonPath("$.name").value(emitterTypeResponse.getName()));
         }
 
         @Test
@@ -127,22 +122,21 @@ class EmitterTypeControllerTest {
         void givenId_whenGetById_thenNotFoundResponse() throws Exception {
                 // given
                 given(emitterTypeService.getEmitterTypeById(anyLong())).willThrow(new ApiException(
-                                HttpStatus.NOT_FOUND,
-                                String.format("Тип излучателя с идентификатором %d не найден", emitterType.getId()),
-                                timestamp));
+                        HttpStatus.NOT_FOUND,
+                        String.format("Тип излучателя с идентификатором %d не найден", emitterType.getId()),
+                        timestamp));
 
                 // when
-                ResultActions result = mockMvc.perform(
-                                get(ENDPOINT + "/{id}", emitterType.getId()).contentType(MediaType.APPLICATION_JSON));
+                ResultActions result = mockMvc.perform(get(ENDPOINT + "/{id}", emitterType.getId())
+                        .contentType(MediaType.APPLICATION_JSON));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.statusCode", is(HttpStatus.NOT_FOUND.value())))
-                                .andExpect(jsonPath("$.message",
-                                                is(String.format("Тип излучателя с идентификатором %d не найден",
-                                                                emitterType.getId()))));
+                        .andDo(print())
+                        .andExpect(status().isNotFound())
+                        .andExpect(jsonPath("$.statusCode", is(HttpStatus.NOT_FOUND.value())))
+                        .andExpect(jsonPath("$.message",
+                                is(String.format("Тип излучателя с идентификатором %d не найден", emitterType.getId()))));
         }
 
         @Test
@@ -151,21 +145,21 @@ class EmitterTypeControllerTest {
                 // given
                 given(mapper.map(any(EmitterTypeRequest.class), eq(EmitterType.class))).willReturn(emitterType);
                 given(mapper.map(any(EmitterType.class), eq(EmitterTypeResponse.class)))
-                                .willReturn(emitterTypeResponse);
+                        .willReturn(emitterTypeResponse);
 
                 given(emitterTypeService.createEmitterType(any(EmitterType.class))).willReturn(emitterType);
 
                 // when
                 ResultActions result = mockMvc.perform(post(ENDPOINT)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(validEmitterTypeRequest)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validEmitterTypeRequest)));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isCreated())
-                                .andExpect(jsonPath("$.id").value(emitterTypeResponse.getId()))
-                                .andExpect(jsonPath("$.name", is(emitterTypeResponse.getName())));
+                        .andDo(print())
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$.id").value(emitterTypeResponse.getId()))
+                        .andExpect(jsonPath("$.name", is(emitterTypeResponse.getName())));
         }
 
         @Test
@@ -173,21 +167,21 @@ class EmitterTypeControllerTest {
         void givenBlankEmitterTypeRequest_whenCreate_thenBadRequestResponse() throws Exception {
                 // given
                 given(emitterTypeService.createEmitterType(any(EmitterType.class))).willThrow(new ApiException(
-                                HttpStatus.BAD_REQUEST,
-                                "Заполните поле \"тип излучателя\"!",
-                                timestamp));
+                        HttpStatus.BAD_REQUEST,
+                        "Заполните поле \"тип излучателя\"!",
+                        timestamp));
 
                 // when
                 ResultActions result = mockMvc.perform(post(ENDPOINT)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(blankEmitterTypeRequest)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(blankEmitterTypeRequest)));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
-                                .andExpect(jsonPath("$.message", is("Заполните поле \"тип излучателя\"!")));
+                        .andDo(print())
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
+                        .andExpect(jsonPath("$.message", is("Заполните поле \"тип излучателя\"!")));
         }
 
         @Test
@@ -195,22 +189,22 @@ class EmitterTypeControllerTest {
         void givenInvalidSizeEmitterTypeRequest_whenCreate_thenBadRequestResponse() throws Exception {
                 // given
                 given(emitterTypeService.createEmitterType(any(EmitterType.class))).willThrow(new ApiException(
-                                HttpStatus.BAD_REQUEST,
-                                "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!",
-                                timestamp));
+                        HttpStatus.BAD_REQUEST,
+                        "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!",
+                        timestamp));
 
                 // when
                 ResultActions result = mockMvc.perform(post(ENDPOINT)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(invalidSizeEmitterTypeRequest)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidSizeEmitterTypeRequest)));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
-                                .andExpect(jsonPath("$.message", is(
-                                                "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
+                        .andDo(print())
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
+                        .andExpect(jsonPath("$.message",
+                                is("Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
         }
 
         @Test
@@ -219,27 +213,27 @@ class EmitterTypeControllerTest {
                 // given
                 EmitterType updatedEmitterType = EmitterType.builder().id(1L).name("Updated").build();
                 EmitterTypeResponse updatedEmitterTypeResponse = EmitterTypeResponse.builder().id(1L).name("Updated")
-                                .build();
+                        .build();
 
                 given(mapper.map(any(EmitterTypeRequest.class), eq(EmitterType.class))).willReturn(emitterType);
                 given(mapper.map(any(EmitterType.class), eq(EmitterTypeResponse.class)))
-                                .willReturn(updatedEmitterTypeResponse);
+                        .willReturn(updatedEmitterTypeResponse);
 
                 given(emitterTypeService.getEmitterTypeById(anyLong())).willReturn(emitterType);
                 given(emitterTypeService.updateEmitterType(anyLong(), any(EmitterType.class)))
-                                .willReturn(updatedEmitterType);
+                        .willReturn(updatedEmitterType);
 
                 // when
                 ResultActions result = mockMvc.perform(put(ENDPOINT + "/{id}", emitterType.getId())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(validEmitterTypeRequest)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validEmitterTypeRequest)));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.id").value(updatedEmitterTypeResponse.getId()))
-                                .andExpect(jsonPath("$.name", is(updatedEmitterTypeResponse.getName())));
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.id").value(updatedEmitterTypeResponse.getId()))
+                        .andExpect(jsonPath("$.name", is(updatedEmitterTypeResponse.getName())));
         }
 
         @Test
@@ -247,22 +241,22 @@ class EmitterTypeControllerTest {
         void givenBlankEmitterTypeRequest_whenEdit_thenBadRequestResponse() throws Exception {
                 // given
                 given(emitterTypeService.updateEmitterType(anyLong(), any(EmitterType.class)))
-                                .willThrow(new ApiException(
-                                                HttpStatus.BAD_REQUEST,
-                                                "Заполните поле \"тип излучателя\"!",
-                                                timestamp));
+                        .willThrow(new ApiException(
+                                HttpStatus.BAD_REQUEST,
+                                "Заполните поле \"тип излучателя\"!",
+                                timestamp));
 
                 // when
                 ResultActions result = mockMvc.perform(put(ENDPOINT + "/{id}", emitterType.getId())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(blankEmitterTypeRequest)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(blankEmitterTypeRequest)));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
-                                .andExpect(jsonPath("$.message", is("Заполните поле \"тип излучателя\"!")));
+                        .andDo(print())
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
+                        .andExpect(jsonPath("$.message", is("Заполните поле \"тип излучателя\"!")));
         }
 
         @Test
@@ -270,23 +264,23 @@ class EmitterTypeControllerTest {
         void givenInvalidSizeEmitterTypeRequest_whenEdit_thenBadRequestResponse() throws Exception {
                 // given
                 given(emitterTypeService.updateEmitterType(anyLong(), any(EmitterType.class)))
-                                .willThrow(new ApiException(
-                                                HttpStatus.BAD_REQUEST,
-                                                "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!",
-                                                timestamp));
+                        .willThrow(new ApiException(
+                                HttpStatus.BAD_REQUEST,
+                                "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!",
+                                timestamp));
 
                 // when
                 ResultActions result = mockMvc.perform(put(ENDPOINT + "/{id}", emitterType.getId())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(invalidSizeEmitterTypeRequest)));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidSizeEmitterTypeRequest)));
 
                 // then
                 result
-                                .andDo(print())
-                                .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
-                                .andExpect(jsonPath("$.message", is(
-                                                "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
+                        .andDo(print())
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
+                        .andExpect(jsonPath("$.message",
+                                is("Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
         }
 
         @Test
@@ -297,15 +291,15 @@ class EmitterTypeControllerTest {
 
                 // when
                 ResultActions result = mockMvc.perform(delete(ENDPOINT + "/{id}", emitterType.getId())
-                                .contentType(MediaType.APPLICATION_JSON));
+                        .contentType(MediaType.APPLICATION_JSON));
 
                 // then
                 verify(emitterTypeService, times(1)).deleteEmitterType(anyLong());
                 result
-                                .andDo(print())
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$", is(String.format("Тип излучателя с id = %d успешно удален",
-                                                emitterType.getId()))));
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", is(String.format("Тип излучателя с id = %d успешно удален",
+                                emitterType.getId()))));
         }
 
         @Test
@@ -313,22 +307,21 @@ class EmitterTypeControllerTest {
         void givenId_whenDelete_thenNotFoundResponse() throws Exception {
                 // given
                 doThrow(new ApiException(
-                                HttpStatus.NOT_FOUND,
-                                String.format("Тип излучателя с идентификатором %d не найден", emitterType.getId()),
-                                Instant.now())).when(emitterTypeService).deleteEmitterType(anyLong());
+                        HttpStatus.NOT_FOUND,
+                        String.format("Тип излучателя с идентификатором %d не найден", emitterType.getId()),
+                        Instant.now())).when(emitterTypeService).deleteEmitterType(anyLong());
 
                 // when
                 ResultActions result = mockMvc.perform(delete(ENDPOINT + "/{id}", emitterType.getId())
-                                .contentType(MediaType.APPLICATION_JSON));
+                        .contentType(MediaType.APPLICATION_JSON));
 
                 // then
                 verify(emitterTypeService, times(1)).deleteEmitterType(anyLong());
                 result
-                                .andDo(print())
-                                .andExpect(status().isNotFound())
-                                .andExpect(jsonPath("$.statusCode", is(HttpStatus.NOT_FOUND.value())))
-                                .andExpect(jsonPath("$.message",
-                                                is(String.format("Тип излучателя с идентификатором %d не найден",
-                                                                emitterType.getId()))));
+                        .andDo(print())
+                        .andExpect(status().isNotFound())
+                        .andExpect(jsonPath("$.statusCode", is(HttpStatus.NOT_FOUND.value())))
+                        .andExpect(jsonPath("$.message",
+                                is(String.format("Тип излучателя с идентификатором %d не найден", emitterType.getId()))));
         }
 }
