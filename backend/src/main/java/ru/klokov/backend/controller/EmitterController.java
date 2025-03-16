@@ -75,8 +75,7 @@ public class EmitterController {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            if (!errors.isEmpty())
-                throw new ApiException(HttpStatus.BAD_REQUEST, errors.get(0).getDefaultMessage(), Instant.now());
+            if (!errors.isEmpty()) throw new ApiException(HttpStatus.BAD_REQUEST, errors.get(0).getDefaultMessage(), Instant.now());
         }
 
         Emitter createdEmitter = emitterService.createEmitter(mapper.map(emitterRequest, Emitter.class));
@@ -93,8 +92,7 @@ public class EmitterController {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            if (!errors.isEmpty())
-                throw new ApiException(HttpStatus.BAD_REQUEST, errors.get(0).getDefaultMessage(), Instant.now());
+            if (!errors.isEmpty()) throw new ApiException(HttpStatus.BAD_REQUEST, errors.get(0).getDefaultMessage(), Instant.now());
         }
 
         System.out.println("emitterRequest: " + emitterRequest);

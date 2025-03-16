@@ -33,8 +33,8 @@ public class EmitterResponse {
     private Double minimumPulseFrequency1000;
     private Double maximumPulseFrequency1000;
 
-    private Integer minimumPulsePower;
-    private Integer maximumPulsePower;
+    private Double minimumPulsePower;
+    private Double maximumPulsePower;
 
     private Double minimumRadiationFluxDivergenceAngle;
     private Double maximumRadiationFluxDivergenceAngle;
@@ -45,6 +45,6 @@ public class EmitterResponse {
     private Double minimumUnevennessOfRadiationFLux;
     private Double maximumUnevennessOfRadiationFLux;
 
-    private EmitterTypeResponse type;
-    private EmitterOwnerResponse owner;
+    private EmitterTypeResponse emitterType;
+    private EmitterOwnerResponse emitterOwner;
 }

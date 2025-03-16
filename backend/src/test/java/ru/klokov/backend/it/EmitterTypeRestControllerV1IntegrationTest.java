@@ -1,24 +1,7 @@
 package ru.klokov.backend.it;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,12 +10,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ru.klokov.backend.dto.emittertype.EmitterTypeRequest;
 import ru.klokov.backend.model.EmitterType;
 import ru.klokov.backend.repository.EmitterTypeRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @Testcontainers
@@ -123,8 +113,7 @@ class EmitterTypeRestControllerV1IntegrationTest extends AbstractRestControllerB
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.statusCode", is(HttpStatus.NOT_FOUND.value())))
                 .andExpect(jsonPath("$.message",
-                        is(String.format("Тип излучателя с идентификатором %d не найден",
-                                emitterType.getId()))));
+                        is(String.format("Тип излучателя с идентификатором %d не найден", emitterType.getId()))));
     }
 
     @Test
@@ -181,8 +170,8 @@ class EmitterTypeRestControllerV1IntegrationTest extends AbstractRestControllerB
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(jsonPath("$.message", is(
-                        "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
+                .andExpect(jsonPath("$.message",
+                        is("Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
     }
 
     @Test
@@ -247,8 +236,8 @@ class EmitterTypeRestControllerV1IntegrationTest extends AbstractRestControllerB
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.statusCode", is(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(jsonPath("$.message", is(
-                        "Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
+                .andExpect(jsonPath("$.message",
+                        is("Тип излучателя должен состоять минимум из 3, и максимум из 50 символов!")));
     }
 
     @Test
@@ -264,13 +253,13 @@ class EmitterTypeRestControllerV1IntegrationTest extends AbstractRestControllerB
 
         // then
         Optional<EmitterType> obtainedEmitterType = emitterTypeRepository.findById(savedEmitterType.getId());
-        assertTrue(obtainedEmitterType.isEmpty());
+        Assertions.assertTrue(obtainedEmitterType.isEmpty());
 
         result
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", is(String.format("Тип излучателя с id = %d успешно удален",
-                        emitterType.getId()))));
+                .andExpect(jsonPath("$",
+                        is(String.format("Тип излучателя с id = %d успешно удален", emitterType.getId()))));
     }
 
     @Test
@@ -289,7 +278,6 @@ class EmitterTypeRestControllerV1IntegrationTest extends AbstractRestControllerB
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.statusCode", is(HttpStatus.NOT_FOUND.value())))
                 .andExpect(jsonPath("$.message",
-                        is(String.format("Тип излучателя с идентификатором %d не найден",
-                                notExistedEmitterTypeId))));
+                        is(String.format("Тип излучателя с идентификатором %d не найден", notExistedEmitterTypeId))));
     }
 }
