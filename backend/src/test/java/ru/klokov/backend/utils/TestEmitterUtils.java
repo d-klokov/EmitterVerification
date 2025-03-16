@@ -1,0 +1,203 @@
+package ru.klokov.backend.utils;
+
+import lombok.Getter;
+import org.springframework.stereotype.Component;
+import ru.klokov.backend.dto.emitter.EmitterRequest;
+import ru.klokov.backend.dto.emitter.EmitterResponse;
+import ru.klokov.backend.dto.emitterowner.EmitterOwnerResponse;
+import ru.klokov.backend.dto.emittertype.EmitterTypeResponse;
+import ru.klokov.backend.model.Emitter;
+import ru.klokov.backend.model.EmitterOwner;
+import ru.klokov.backend.model.EmitterType;
+
+import java.time.LocalDate;
+
+@Component
+@Getter
+public class TestEmitterUtils {
+    private final EmitterType emitterType = EmitterType.builder().id(1L).name("Type 1").build();
+    private final EmitterTypeResponse emitterTypeResponse = EmitterTypeResponse.builder().id(1L).name("Type 1").build();
+
+    private final EmitterOwner emitterOwner = EmitterOwner.builder().id(1L).name("Owner 1").build();
+    private final EmitterOwnerResponse emitterOwnerResponse = EmitterOwnerResponse.builder().id(1L).name("Owner 1").build();
+
+    private final Emitter emitterWithInternalGenerator = Emitter.builder()
+            .emitterType(emitterType)
+            .emitterOwner(emitterOwner)
+            .factoryNumber("Emitter_1_Factory_Number")
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(true)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+
+    private final Emitter emitterWithoutInternalGenerator = Emitter.builder()
+            .emitterType(emitterType)
+            .emitterOwner(emitterOwner)
+            .factoryNumber("Emitter_1_Factory_Number")
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(false)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulseFrequency10(8.0)
+            .maximumPulseFrequency10(12.0)
+            .minimumPulseFrequency100(80.0)
+            .maximumPulseFrequency100(120.0)
+            .minimumPulseFrequency1000(800.0)
+            .maximumPulseFrequency1000(1200.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+
+    private final EmitterRequest emitterRequestWithInternalGenerator = EmitterRequest.builder()
+            .emitterTypeId(emitterType.getId())
+            .emitterOwnerId(emitterOwner.getId())
+            .factoryNumber("Emitter_1_Factory_Number")
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(true)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+
+    private final EmitterRequest emitterRequestWithoutInternalGenerator = EmitterRequest.builder()
+            .emitterTypeId(emitterType.getId())
+            .emitterOwnerId(emitterOwner.getId())
+            .factoryNumber("Emitter_1_Factory_Number")
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(false)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulseFrequency10(8.0)
+            .maximumPulseFrequency10(12.0)
+            .minimumPulseFrequency100(80.0)
+            .maximumPulseFrequency100(120.0)
+            .minimumPulseFrequency1000(800.0)
+            .maximumPulseFrequency1000(1200.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+
+    private final EmitterRequest emitterRequestWithBlankFactoryNumber = EmitterRequest.builder()
+            .emitterTypeId(emitterType.getId())
+            .emitterOwnerId(emitterOwner.getId())
+            .factoryNumber("   ")
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(true)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+
+    private final EmitterRequest emitterRequestWithInvalidSizeFactoryNumber = EmitterRequest.builder()
+            .emitterTypeId(emitterType.getId())
+            .emitterOwnerId(emitterOwner.getId())
+            .factoryNumber("1")
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(true)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+
+    private final EmitterResponse emitterResponseWithInternalGenerator = EmitterResponse.builder()
+            .id(emitterWithInternalGenerator.getId())
+            .emitterType(emitterTypeResponse)
+            .emitterOwner(emitterOwnerResponse)
+            .factoryNumber(emitterWithInternalGenerator.getFactoryNumber())
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(true)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+
+    private final EmitterResponse emitterResponseWithoutInternalGenerator = EmitterResponse.builder()
+            .id(emitterWithInternalGenerator.getId())
+            .emitterType(emitterTypeResponse)
+            .emitterOwner(emitterOwnerResponse)
+            .factoryNumber(emitterWithInternalGenerator.getFactoryNumber())
+            .manufactureDate(LocalDate.now().minusYears(1))
+            .verificationPeriodicityInMonths(12)
+            .forExternalUse(false)
+            .hasInternalGenerator(false)
+            .minimumPulseWidth(20.0)
+            .maximumPulseWidth(100.0)
+            .minimumPulseFrequency10(8.0)
+            .maximumPulseFrequency10(12.0)
+            .minimumPulseFrequency100(80.0)
+            .maximumPulseFrequency100(120.0)
+            .minimumPulseFrequency1000(800.0)
+            .maximumPulseFrequency1000(1200.0)
+            .minimumPulsePower(100.0)
+            .maximumPulsePower(1000.0)
+            .minimumRadiationFluxDivergenceAngle(8.0)
+            .maximumRadiationFluxDivergenceAngle(12.0)
+            .minimumNonParallelismOfTheOpticalAndConstructionAxis(8.0)
+            .maximumNonParallelismOfTheOpticalAndConstructionAxis(12.0)
+            .minimumUnevennessOfRadiationFLux(30.0)
+            .maximumUnevennessOfRadiationFLux(70.0)
+            .build();
+}
