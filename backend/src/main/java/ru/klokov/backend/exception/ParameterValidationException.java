@@ -7,22 +7,22 @@ import org.springframework.http.HttpStatus;
 import lombok.Getter;
 
 @Getter
-public class AppException extends RuntimeException {
+public class ParameterValidationException extends RuntimeException {
     private final HttpStatus status;
     private final Instant timestamp;
 
-    public AppException(HttpStatus status, String message, Instant timestamp) {
+    public ParameterValidationException(HttpStatus status, String message, Instant timestamp) {
         super(message);
         this.status = status;
         this.timestamp = timestamp;
     }
 
-    public AppException(HttpStatus status) {
+    public ParameterValidationException(HttpStatus status) {
         this.status = status;
         this.timestamp = Instant.now();
     }
 
-    public AppException(HttpStatus status, String message) {
+    public ParameterValidationException(HttpStatus status, String message) {
         super(message);
         this.status = status;
         this.timestamp = Instant.now();

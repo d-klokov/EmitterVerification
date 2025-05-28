@@ -1,4 +1,4 @@
-package ru.klokov.backend.dto;
+package ru.klokov.backend.dto.error;
 
 import java.time.Instant;
 
@@ -7,10 +7,8 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class AppErrorResponse {
-
+public class ServerErrorResponse {
     private final int statusCode;
     private final String message;
     private final Instant timestamp;
-
 }

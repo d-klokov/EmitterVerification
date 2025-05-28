@@ -2,14 +2,11 @@ spring:
   application:
     name: EmitterVerification
   
-  config:
-    import: optional:file:.env[.properties]
-  
   datasource:
-    url: jdbc:postgresql://${HOST}:5432/${POSTGRES_DATABASE}
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
-    driver-class-name: ${POSTGRES_DRIVER}
+    url: jdbc:postgresql://${HOST:localhost}:5432/${POSTGRES_DATABASE:emitterverificationdb}
+    username: ${POSTGRES_USERNAME:root}
+    password: ${POSTGRES_PASSWORD:root}
+    driver-class-name: ${POSTGRES_DRIVER:org.postgresql.Driver}
   
   jpa:
     hibernate:
@@ -18,3 +15,11 @@ spring:
     properties:
       hibernate:
         format-sql: true
+
+page:
+  default:
+    number: 1
+    size: 5
+    sort:
+      field: id
+      direction: true
