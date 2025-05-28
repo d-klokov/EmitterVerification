@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.klokov.backend.exception.AppException;
+import ru.klokov.backend.exception.ServerException;
 import ru.klokov.backend.model.EmitterType;
 import ru.klokov.backend.repository.EmitterTypeRepository;
 import ru.klokov.backend.service.EmitterTypeService;
@@ -37,7 +37,7 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
         log.info("Method getEmitterTypeById executed with parameter {}", id);
 
         return emitterTypeRepository.findById(id).orElseThrow(
-                () -> new AppException(
+                () -> new ServerException(
                         HttpStatus.NOT_FOUND,
                         String.format("Тип излучателя с идентификатором %d не найден", id),
                         Instant.now()));
@@ -60,9 +60,9 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
         try {
             return emitterTypeRepository.save(emitterType);
         } catch (DataIntegrityViolationException exception) {
-            throw new AppException(
+            throw new ServerException(
                     HttpStatus.CONFLICT,
-                    String.format("Тип излучателя с названием '%s' уже существует", emitterType.getName()),
+                    String.format("Тип излучателя с названием \"%s\" уже существует", emitterType.getName()),
                     Instant.now());
         }
     }
@@ -72,7 +72,7 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
         log.info("Method updateEmitterType executed with parameters {}, {}", emitterType, id);
 
         EmitterType emitterTypeToUpdate = emitterTypeRepository.findById(id).orElseThrow(
-                () -> new AppException(
+                () -> new ServerException(
                         HttpStatus.NOT_FOUND,
                         String.format("Тип излучателя с идентификатором %d не найден", id),
                         Instant.now()));
@@ -82,8 +82,8 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
         try {
             return emitterTypeRepository.save(emitterTypeToUpdate);
         } catch (DataIntegrityViolationException exception) {
-            throw new AppException(HttpStatus.CONFLICT,
-                    String.format("Тип излучателя с названием '%s' уже существует", emitterType.getName()),
+            throw new ServerException(HttpStatus.CONFLICT,
+                    String.format("Тип излучателя с названием \"%s\" уже существует", emitterType.getName()),
                     Instant.now());
         }
     }
@@ -93,7 +93,7 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
         log.info("Method deleteEmitterType executed with parameter {}", id);
 
         emitterTypeRepository.findById(id).orElseThrow(
-                () -> new AppException(
+                () -> new ServerException(
                         HttpStatus.NOT_FOUND,
                         String.format("Тип излучателя с идентификатором %d не найден", id),
                         Instant.now()));
