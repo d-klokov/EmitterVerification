@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import ru.klokov.backend.exception.ServerException;
+import ru.klokov.backend.exception.ParameterValidationException;
 
 @Component
 public class PageUtils {
@@ -23,22 +23,31 @@ public class PageUtils {
     private boolean PAGE_SORT_FIELD_DIRECTION_DEFAULT_VALUE;
 
     public int getPageNumber(String pageNumberParam) {
-        if (pageNumberParam != null && !pageNumberParam.isBlank())
+        if (pageNumberParam != null && !pageNumberParam.isBlank()) {
             try {
                 return Integer.parseInt(pageNumberParam);
             } catch (NumberFormatException e) {
-                throw new ServerException(
-                    HttpStatus.BAD_REQUEST, 
-                    "Некорректный параметр \"Номер страницы\"",
-                    Instant.now());
+                throw new ParameterValidationException(
+                        HttpStatus.BAD_REQUEST,
+                        "Некорректный параметр \"Номер страницы\"",
+                        Instant.now());
             }
+        }
 
         return PAGE_NUMBER_DEFAULT_VALUE;
     }
 
     public int getPageSize(String pageSizeParam) {
-        if (pageSizeParam != null && !pageSizeParam.isBlank())
-            return Integer.parseInt(pageSizeParam);
+        if (pageSizeParam != null && !pageSizeParam.isBlank()) {
+            try {
+                return Integer.parseInt(pageSizeParam);
+            } catch (NumberFormatException e) {
+                throw new ParameterValidationException(
+                        HttpStatus.BAD_REQUEST,
+                        "Некорректный параметр \"Количество элементов на странице\"",
+                        Instant.now());
+            }
+        }
 
         return PAGE_SIZE_DEFAULT_VALUE;
     }
