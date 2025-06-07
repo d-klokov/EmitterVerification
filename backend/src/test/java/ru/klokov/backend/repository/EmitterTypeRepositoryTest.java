@@ -182,6 +182,7 @@ class EmitterTypeRepositoryTest {
         // when
         savedEmitterType.setName(null);
 
+        // then
         assertThatThrownBy(() -> emitterTypeRepository.saveAndFlush(savedEmitterType))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
