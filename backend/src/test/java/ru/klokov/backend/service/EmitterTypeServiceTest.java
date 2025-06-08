@@ -43,7 +43,7 @@ public class EmitterTypeServiceTest {
 
     @Test
     @DisplayName("Test get all emitter types functionality")
-    void givenTwoEmitterTypes_getAllEmitterTypes_ShouldReturnListOfEmitterTypes() {
+    void givenTwoEmitterTypes_whenGetAllEmitterTypes_ShouldReturnListOfEmitterTypes() {
         // given
         EmitterType type1 = EmitterType.builder().id(1L).name("Type1").build();
         EmitterType type2 = EmitterType.builder().id(2L).name("Type2").build();
@@ -61,7 +61,7 @@ public class EmitterTypeServiceTest {
 
     @Test
     @DisplayName("Test get emitter type by id functionality (success)")
-    void givenId_getEmitterTypeById_ShouldReturnEmitterTypeWithGivenId() {
+    void givenId_whenGetEmitterTypeById_ShouldReturnEmitterTypeWithGivenId() {
         // given
         Long typeId = 1L;
         String typeName = "Type 1";
@@ -80,7 +80,7 @@ public class EmitterTypeServiceTest {
 
     @Test
     @DisplayName("Test get emitter type by id functionality (not found)")
-    void givenId_whenGetById_thenThrowServerException() {
+    void givenId_whenGetEmitterTypeById_thenThrowServerException() {
         // given
         Long typeId = Long.MAX_VALUE;
 

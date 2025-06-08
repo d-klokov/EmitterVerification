@@ -73,7 +73,6 @@ public class EmitterTypeController {
                 emitterTypesList);
 
         return ResponseEntity.ok(response);
-
     }
 
     @GetMapping("/{id}")
@@ -89,7 +88,7 @@ public class EmitterTypeController {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            Map<String, String> errorMessages = ValidationUtils.getErrorMessages(errors);
+            Map<String, List<String>> errorMessages = ValidationUtils.getErrorMessages(errors);
             throw new FormValidationException(HttpStatus.BAD_REQUEST, errorMessages, Instant.now());
         }
 
@@ -108,7 +107,7 @@ public class EmitterTypeController {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
 
-            Map<String, String> errorMessages = ValidationUtils.getErrorMessages(errors);
+            Map<String, List<String>> errorMessages = ValidationUtils.getErrorMessages(errors);
             throw new FormValidationException(HttpStatus.BAD_REQUEST, errorMessages, Instant.now());
         }
 
