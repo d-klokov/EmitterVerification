@@ -2,3 +2,4 @@
 .vscode/settings.json
 backend/client.http
 backend/.env
+.vscode/java-formatter.xml
