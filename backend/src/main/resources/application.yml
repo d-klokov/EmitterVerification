@@ -23,3 +23,7 @@ page:
     sort:
       field: id
       direction: true
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
