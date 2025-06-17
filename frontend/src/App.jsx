@@ -1,11 +1,19 @@
 import "./App.css";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./presentation/Theme";
 import { BrowserRouter } from "react-router-dom";
+import Navbar from "./presentation/components/Navbar/Navbar";
+import AppRoutes from "./presentation/Routes";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <h1>Hello!</h1>
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <Navbar />
+
+        <AppRoutes />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 
