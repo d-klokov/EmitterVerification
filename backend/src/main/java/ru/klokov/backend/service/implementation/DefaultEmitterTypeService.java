@@ -2,7 +2,6 @@ package ru.klokov.backend.service.implementation;
 
 import java.time.Instant;
 import java.util.List;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.klokov.backend.exception.ServerException;
@@ -48,7 +46,8 @@ public class DefaultEmitterTypeService implements EmitterTypeService {
         log.info("Method getEmitterTypesPage executed with parameter {}", pageNumber);
 
         Sort sort = sortAsc ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+        // Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         return emitterTypeRepository.findAll(pageable);
     }
